@@ -52,18 +52,21 @@ class CategoryRepository extends Actor with ActorLogging {
       CategoriesDao.create(category)
       sender() ! ActionPerformed(s"Category ${category.name} created.")
 
-    // TODO
-    //    case UpdateCategory(id, category) =>
-    //      log.info(s"Updating category $category")
-    //      categories = categories + (id -> category)
-    //      sender() ! OperationSuccess
+    case UpdateCategory(id, category) =>
+      log.info(s"Updating category $category")
+      val result = CategoriesDao.update(id, category)
+      val originalSender = sender
+      result.onComplete {
+        case Success(success) => originalSender ! ActionPerformed(s"Category $id updated")
+        case Failure(failure) => println(s"Unable to update category $id")
+      }
 
     case DeleteCategory(id) =>
       println(s"Removing category id $id")
       val category = CategoriesDao.delete(id)
       val originalSender = sender
       category.onComplete {
-        case Success(category) => originalSender ! ActionPerformed(s"Category $id deleted")
+        case Success(success) => originalSender ! ActionPerformed(s"Category $id deleted")
         case Failure(failure) => println(s"Unable to delete category $id")
       }
   }

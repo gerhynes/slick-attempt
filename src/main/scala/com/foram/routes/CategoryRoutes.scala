@@ -1,7 +1,6 @@
 package com.foram.routes
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.StatusCodes
@@ -23,18 +22,25 @@ class CategoryRoutes {
   val categoryRoutes =
     pathPrefix("api" / "categories") {
       get {
-          path(IntNumber) { id =>
-            complete((categoryRepository ? GetCategoryByID(id)).mapTo[Category])
-          } ~
+        path(IntNumber) { id =>
+          complete((categoryRepository ? GetCategoryByID(id)).mapTo[Category])
+        } ~
           pathEndOrSingleSlash {
             complete((categoryRepository ? GetAllCategories).mapTo[List[Category]])
           }
-      }~
+      } ~
         post {
           entity(as[Category]) { category =>
             complete((categoryRepository ? CreateCategory(category)).map(_ => StatusCodes.OK))
           }
-        }~
+        } ~
+        put {
+          path(IntNumber) { id =>
+            entity(as[Category]) { category =>
+              complete((categoryRepository ? UpdateCategory(id, category)).map(_ => StatusCodes.OK))
+            }
+          }
+        } ~
         delete {
           path(IntNumber) { id =>
             complete((categoryRepository ? DeleteCategory(id)).map(_ => StatusCodes.OK))
