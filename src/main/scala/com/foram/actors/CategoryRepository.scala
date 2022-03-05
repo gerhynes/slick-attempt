@@ -3,7 +3,7 @@ package com.foram.actors
 import scala.concurrent.ExecutionContext.Implicits.global
 import akka.actor.{Actor, ActorLogging, Props}
 import com.foram.dao.CategoriesDao
-import com.foram.models.{Category, Categories}
+import com.foram.models.{Category}
 import scala.util.{Failure, Success}
 
 object CategoryRepository {
@@ -30,18 +30,20 @@ class CategoryRepository extends Actor with ActorLogging {
 
   override def receive: Receive = {
     case GetAllCategories =>
-      println(s"CategoryRepositoryActor Searching for categories")
+      println(s"Searching for categories")
       val allCategories = CategoriesDao.findAll
+      val originalSender = sender
       allCategories.onComplete {
-        case Success(categories) => sender() ! Categories(categories)
+        case Success(categories) => originalSender ! categories.toList
         case Failure(failure) => println("Data not found")
       }
 
     case GetCategoryByID(id) =>
       println(s"Finding category with id: $id")
       val category = CategoriesDao.findById(id)
+      val originalSender = sender
       category.onComplete {
-        case Success(category) => sender() ! category
+        case Success(category) => originalSender ! category
         case Failure(failure) => println(s"$id category not found")
       }
 
@@ -59,8 +61,9 @@ class CategoryRepository extends Actor with ActorLogging {
     case DeleteCategory(id) =>
       println(s"Removing category id $id")
       val category = CategoriesDao.delete(id)
+      val originalSender = sender
       category.onComplete {
-        case Success(category) => sender() ! ActionPerformed(s"Category $id deleted")
+        case Success(category) => originalSender ! ActionPerformed(s"Category $id deleted")
         case Failure(failure) => println(s"Unable to delete category $id")
       }
   }

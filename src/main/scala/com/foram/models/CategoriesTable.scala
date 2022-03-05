@@ -4,7 +4,7 @@ import slick.jdbc.PostgresProfile.api._
 
 case class Category(id: Int, name: String, slug: String, user_id: Int, description: String)
 
-case class Categories(categories: Seq[Category])
+// case class Categories(categories: Seq[Category])
 
 class CategoriesTable(tag: Tag) extends Table[Category](tag, "categories") {
   def id = column[Int]("id", O.PrimaryKey)
