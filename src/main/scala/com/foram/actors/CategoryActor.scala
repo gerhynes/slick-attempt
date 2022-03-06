@@ -6,7 +6,7 @@ import com.foram.dao.CategoriesDao
 import com.foram.models.{Category}
 import scala.util.{Failure, Success}
 
-object CategoryRepository {
+object CategoryActor {
   case class ActionPerformed(action: String)
 
   case object GetAllCategories
@@ -21,12 +21,12 @@ object CategoryRepository {
 
   case object OperationSuccess
 
-  def props = Props[CategoryRepository]
+  def props = Props[CategoryActor]
 }
 
-class CategoryRepository extends Actor with ActorLogging {
+class CategoryActor extends Actor with ActorLogging {
 
-  import CategoryRepository._
+  import CategoryActor._
 
   override def receive: Receive = {
     case GetAllCategories =>
@@ -35,7 +35,7 @@ class CategoryRepository extends Actor with ActorLogging {
       val originalSender = sender
       allCategories.onComplete {
         case Success(categories) => originalSender ! categories.toList
-        case Failure(failure) => println("Data not found")
+        case Failure(failure) => println("Categories not found")
       }
 
     case GetCategoryByID(id) =>
@@ -44,7 +44,7 @@ class CategoryRepository extends Actor with ActorLogging {
       val originalSender = sender
       category.onComplete {
         case Success(category) => originalSender ! category
-        case Failure(failure) => println(s"$id category not found")
+        case Failure(failure) => println(s"Category $id not found")
       }
 
     case CreateCategory(category) =>
