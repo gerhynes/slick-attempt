@@ -5,45 +5,45 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.server.Directives._
 import akka.pattern.ask
 import akka.util.Timeout
-import com.foram.Main.categoryActor
-import com.foram.actors.CategoryActor._
-import com.foram.models.Category
+import com.foram.Main.postActor
+import com.foram.actors.PostActor._
+import com.foram.models.Post
 import spray.json.DefaultJsonProtocol._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
-object CategoryRoutes {
+object PostRoutes {
 
   import com.foram.JsonFormats._
 
   implicit val timeout = Timeout(5 seconds)
 
   val routes =
-    pathPrefix("api" / "categories") {
+    pathPrefix("api" / "posts") {
       get {
         path(IntNumber) { id =>
-          complete((categoryActor ? GetCategoryByID(id)).mapTo[Category])
+          complete((postActor ? GetPostByID(id)).mapTo[Post])
         } ~
           pathEndOrSingleSlash {
-            complete((categoryActor ? GetAllCategories).mapTo[List[Category]])
+            complete((postActor ? GetAllPosts).mapTo[List[Post]])
           }
       } ~
         post {
-          entity(as[Category]) { category =>
-            complete((categoryActor ? CreateCategory(category)).map(_ => StatusCodes.OK))
+          entity(as[Post]) { post =>
+            complete((postActor ? CreatePost(post)).map(_ => StatusCodes.OK))
           }
         } ~
         put {
           path(IntNumber) { id =>
-            entity(as[Category]) { category =>
-              complete((categoryActor ? UpdateCategory(id, category)).map(_ => StatusCodes.OK))
+            entity(as[Post]) { post =>
+              complete((postActor ? UpdatePost(id, post)).map(_ => StatusCodes.OK))
             }
           }
         } ~
         delete {
           path(IntNumber) { id =>
-            complete((categoryActor ? DeleteCategory(id)).map(_ => StatusCodes.OK))
+            complete((postActor ? DeletePost(id)).map(_ => StatusCodes.OK))
           }
         }
     }

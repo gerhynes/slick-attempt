@@ -1,9 +1,10 @@
 package com.foram.actors
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import akka.actor.{Actor, ActorLogging, Props}
 import com.foram.dao.CategoriesDao
-import com.foram.models.{Category}
+import com.foram.models.Category
+
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 
 object CategoryActor {

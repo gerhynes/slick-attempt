@@ -1,19 +1,27 @@
 package com.foram.actors
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.{Actor, ActorLogging}
 import com.foram.dao.UsersDao
-import com.foram.models.{User}
+import com.foram.models.User
+
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.{Failure, Success}
 
 object UserActor {
   case class ActionPerformed(action: String)
+
   case object GetAllUsers
+
   case class GetUserByUsername(username: String)
+
   case class GetUserByID(id: Int)
+
   case class CreateUser(user: User)
+
   case class UpdateUser(id: Int, user: User)
+
   case class DeleteUser(id: Int)
+
   case object OperationSuccess
 }
 

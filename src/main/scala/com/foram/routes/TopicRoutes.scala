@@ -1,17 +1,17 @@
 package com.foram.routes
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration._
-import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.marshallers.sprayjson.SprayJsonSupport._
 import akka.http.scaladsl.model.StatusCodes
-import spray.json.DefaultJsonProtocol._
-import akka.util.Timeout
+import akka.http.scaladsl.server.Directives._
 import akka.pattern.ask
-import com.foram.Main.topicActor
-import com.foram.models.Topic
+import akka.util.Timeout
+import com.foram.Main.{postActor, topicActor}
+import com.foram.actors.PostActor._
 import com.foram.actors.TopicActor._
+import com.foram.models.{Post, Topic}
+import spray.json.DefaultJsonProtocol._
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 object TopicRoutes {
@@ -23,9 +23,9 @@ object TopicRoutes {
   val routes =
     pathPrefix("api" / "topics") {
       get {
-//        path(IntNumber / "posts") { topic_id =>
-//          complete((postDB ? GetPostsByTopic(topic_id)).mapTo[List[Post]])
-//        } ~
+        path(IntNumber / "posts") { topic_id =>
+          complete((postActor ? GetPostsByTopicID(topic_id)).mapTo[List[Post]])
+        } ~
           path(IntNumber) { id =>
             complete((topicActor ? GetTopicByID(id)).mapTo[Topic])
           } ~
