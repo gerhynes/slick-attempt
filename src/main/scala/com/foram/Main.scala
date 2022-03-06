@@ -17,6 +17,7 @@ object Main extends App {
   // Set up actors
   val categoryActor = system.actorOf(Props[CategoryActor], "categoryActor")
   val userActor = system.actorOf(Props[UserActor], "userActor")
+  val topicActor = system.actorOf(Props[TopicActor], "topicActor")
 
   // Get all routes
   val routes = MainRouter.routes
