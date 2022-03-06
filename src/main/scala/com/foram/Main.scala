@@ -6,6 +6,7 @@ import akka.actor.{ActorSystem, Props}
 import akka.http.scaladsl.Http
 import akka.stream.ActorMaterializer
 import com.foram.actors._
+
 import scala.util.{Failure, Success}
 
 object Main extends App {
@@ -14,11 +15,11 @@ object Main extends App {
   implicit val materializer = ActorMaterializer()
 
   // Set up actors
-  val categoryRepository = system.actorOf(Props[CategoryRepository], "categoryRepository")
+  val categoryActor = system.actorOf(Props[CategoryActor], "categoryActor")
+  val userActor = system.actorOf(Props[UserActor], "userActor")
 
-  val categoryRouter = new CategoryRoutes()
-
-  val routes = categoryRouter.categoryRoutes
+  // Get all routes
+  val routes = MainRouter.routes
 
   val bindingFuture = Http().newServerAt("localhost", 8080).bind(routes)
 
@@ -28,6 +29,4 @@ object Main extends App {
       e.printStackTrace()
       system.terminate()
   }
-
-  // println(s"Server now online at http://localhost:8080")
 }
